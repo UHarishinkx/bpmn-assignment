@@ -1,7 +1,4 @@
 # BPMN Process Modeling Assignment(ALL BPMN files are inside bpmn folder and the screenshots are in readme and in images folder)
-
-This repository contains three BPMN process models built for Camunda Modeler, covering three business scenarios: employee leave approval, online purchase order processing, and IT service request handling.
-
 ## Scenario 1: Employee Leave Approval
 ![Scenario 1 - Employee Leave Approval](images/leave-approval.png)
 
@@ -18,10 +15,6 @@ An employee applies for leave through the HR system. The system first checks whe
    - **Approved** → **Task** "Update Employee Leave Balance" → **Task** "Send Approval Notification" → **End Event** "Leave Approved".
    - **Rejected** → **Task** "Send Rejection Notification" → **End Event** "Leave Rejected".
 
-### Why it's modeled this way
-There are two decision points (balance check, manager decision), each represented by an **Exclusive Gateway** since only one outgoing path can be taken. The process has three distinct terminations (approved, rejected, insufficient balance), so it uses **three separate End Events** rather than merging outcomes — this keeps each end state clearly traceable, which is good BPMN practice when outcomes are semantically different.
-
----
 
 ## Scenario 2: Online Purchase Order Processing
 ![Scenario 2 - Online Purchase](images/purchase-order.png)
@@ -39,10 +32,6 @@ A customer places an online order. The system checks stock availability and proc
    - **No** → **Task** "Notify Customer - Payment Failed" → **End Event** "Payment Failed" (process ends here).
    - **Yes** → **Task** "Confirm Order" → **Task** "Prepare Product for Shipment" → **Task** "Ship Order" → **Task** "Send Shipping Confirmation" → **End Event** "Order Completed".
 
-### Why it's modeled this way
-This scenario has **two independent decision points**, each capable of ending the process early (out of stock, payment failure) — demonstrating **multiple process paths** as required. Only orders that pass both checks proceed through the full fulfillment chain (confirm → prepare → ship → notify), shown as a straight sequential path since no further branching is needed after payment succeeds.
-
----
 
 ## Scenario 3: IT Service Request
 ![Scenario 3 - IT Service Request](images/it-service-request.png)
@@ -67,15 +56,3 @@ An employee reports an IT problem. The help desk registers and triages it by sev
 8. **Task** – "Update Request Status".
 9. **Task** – "Send Resolution Notification to Employee".
 10. **End Event** – "Request Resolved".
-
-### Why it's modeled this way
-This scenario needed **two separate exclusive decisions** (severity level, then resolvability), each with genuinely alternative paths that later rejoin the main flow — so **converging Exclusive Gateways** are used to bring both branches back into a single path before the final steps (status update + notification), since regardless of *which* technician resolved it or *how*, the closing steps are identical. This avoids duplicating the "Update Status → Notify → End" tasks on every branch.
-
----
-
-## Notes on Modeling Choices
-
-- All gateways used are **Exclusive Gateways (XOR)** since every decision point in these scenarios has mutually exclusive outcomes (only one path is ever taken).
-- Sequence flows leaving a gateway are labeled (e.g., "Yes"/"No", "Low Severity"/"High Severity") to make the decision logic self-explanatory when viewed in Camunda Modeler.
-- Processes are marked `isExecutable="false"` since these are conceptual/documentation models (no service implementations, forms, or connectors attached) — they can be switched to executable and enriched with Camunda-specific attributes (e.g., `camunda:assignee`, forms, DMN) if the assignment later requires deployment.
-- Each model was validated as well-formed BPMN 2.0 XML before submission.
