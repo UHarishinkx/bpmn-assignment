@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" id="Definitions_LeaveApproval" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="5.49.0">
+  <bpmn:process id="Process_LeaveApproval" name="Employee Leave Approval" isExecutable="false">
+    <bpmn:startEvent id="StartEvent_1" name="Employee Submits Leave Request">
+      <bpmn:outgoing>Flow_Start_Check</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:task id="Task_CheckBalance" name="Check Leave Balance">
+      <bpmn:incoming>Flow_Start_Check</bpmn:incoming>
+      <bpmn:outgoing>Flow_Check_Gate1</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:exclusiveGateway id="Gateway_Sufficient" name="Sufficient Balance?">
+      <bpmn:incoming>Flow_Check_Gate1</bpmn:incoming>
+      <bpmn:outgoing>Flow_Gate1_Manager</bpmn:outgoing>
+      <bpmn:outgoing>Flow_Gate1_Insufficient</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:task id="Task_SendToManager" name="Send Request to Manager for Approval">
+      <bpmn:incoming>Flow_Gate1_Manager</bpmn:incoming>
+      <bpmn:outgoing>Flow_Manager_Gate2</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:exclusiveGateway id="Gateway_ManagerApprove" name="Manager Approves?">
+      <bpmn:incoming>Flow_Manager_Gate2</bpmn:incoming>
+      <bpmn:outgoing>Flow_Gate2_Update</bpmn:outgoing>
+      <bpmn:outgoing>Flow_Gate2_Reject</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:task id="Task_UpdateBalance" name="Update Employee Leave Balance">
+      <bpmn:incoming>Flow_Gate2_Update</bpmn:incoming>
+      <bpmn:outgoing>Flow_Update_SendApproval</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:task id="Task_SendApproval" name="Send Approval Notification">
+      <bpmn:incoming>Flow_Update_SendApproval</bpmn:incoming>
+      <bpmn:outgoing>Flow_SendApproval_End</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:endEvent id="EndEvent_Approved" name="Leave Approved">
+      <bpmn:incoming>Flow_SendApproval_End</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:task id="Task_RejectNotify" name="Send Rejection Notification">
+      <bpmn:incoming>Flow_Gate2_Reject</bpmn:incoming>
+      <bpmn:outgoing>Flow_RejectNotify_End</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:endEvent id="EndEvent_Rejected" name="Leave Rejected">
+      <bpmn:incoming>Flow_RejectNotify_End</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:task id="Task_InsufficientNotify" name="Send Insufficient Balance Notification">
+      <bpmn:incoming>Flow_Gate1_Insufficient</bpmn:incoming>
+      <bpmn:outgoing>Flow_InsufficientNotify_End</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:endEvent id="EndEvent_Insufficient" name="Insufficient Balance">
+      <bpmn:incoming>Flow_InsufficientNotify_End</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="Flow_Start_Check" sourceRef="StartEvent_1" targetRef="Task_CheckBalance" />
+    <bpmn:sequenceFlow id="Flow_Check_Gate1" sourceRef="Task_CheckBalance" targetRef="Gateway_Sufficient" />
+    <bpmn:sequenceFlow id="Flow_Gate1_Manager" name="Yes" sourceRef="Gateway_Sufficient" targetRef="Task_SendToManager" />
+    <bpmn:sequenceFlow id="Flow_Gate1_Insufficient" name="No" sourceRef="Gateway_Sufficient" targetRef="Task_InsufficientNotify" />
+    <bpmn:sequenceFlow id="Flow_Manager_Gate2" sourceRef="Task_SendToManager" targetRef="Gateway_ManagerApprove" />
+    <bpmn:sequenceFlow id="Flow_Gate2_Update" name="Approved" sourceRef="Gateway_ManagerApprove" targetRef="Task_UpdateBalance" />
+    <bpmn:sequenceFlow id="Flow_Gate2_Reject" name="Rejected" sourceRef="Gateway_ManagerApprove" targetRef="Task_RejectNotify" />
+    <bpmn:sequenceFlow id="Flow_Update_SendApproval" sourceRef="Task_UpdateBalance" targetRef="Task_SendApproval" />
+    <bpmn:sequenceFlow id="Flow_SendApproval_End" sourceRef="Task_SendApproval" targetRef="EndEvent_Approved" />
+    <bpmn:sequenceFlow id="Flow_RejectNotify_End" sourceRef="Task_RejectNotify" targetRef="EndEvent_Rejected" />
+    <bpmn:sequenceFlow id="Flow_InsufficientNotify_End" sourceRef="Task_InsufficientNotify" targetRef="EndEvent_Insufficient" />
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Process_LeaveApproval">
+      <bpmndi:BPMNShape id="StartEvent_1_di" bpmnElement="StartEvent_1">
+        <dc:Bounds x="140" y="112" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="121" y="148" width="73" height="40" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_CheckBalance_di" bpmnElement="Task_CheckBalance">
+        <dc:Bounds x="230" y="90" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_Sufficient_di" bpmnElement="Gateway_Sufficient" isMarkerVisible="true">
+        <dc:Bounds x="400" y="105" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="388" y="76" width="73" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_SendToManager_di" bpmnElement="Task_SendToManager">
+        <dc:Bounds x="500" y="90" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_ManagerApprove_di" bpmnElement="Gateway_ManagerApprove" isMarkerVisible="true">
+        <dc:Bounds x="650" y="105" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="649" y="76" width="53" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_RejectNotify_di" bpmnElement="Task_RejectNotify">
+        <dc:Bounds x="625" y="270" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="EndEvent_Rejected_di" bpmnElement="EndEvent_Rejected">
+        <dc:Bounds x="775" y="292" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="754" y="333" width="77" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_InsufficientNotify_di" bpmnElement="Task_InsufficientNotify">
+        <dc:Bounds x="375" y="270" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="EndEvent_Insufficient_di" bpmnElement="EndEvent_Insufficient">
+        <dc:Bounds x="525" y="292" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="509" y="336" width="67" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="EndEvent_Approved_di" bpmnElement="EndEvent_Approved">
+        <dc:Bounds x="1202" y="112" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1180" y="148" width="81" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_UpdateBalance_di" bpmnElement="Task_UpdateBalance">
+        <dc:Bounds x="820" y="90" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_SendApproval_di" bpmnElement="Task_SendApproval">
+        <dc:Bounds x="1010" y="90" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_Start_Check_di" bpmnElement="Flow_Start_Check">
+        <di:waypoint x="176" y="130" />
+        <di:waypoint x="230" y="130" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_Check_Gate1_di" bpmnElement="Flow_Check_Gate1">
+        <di:waypoint x="330" y="130" />
+        <di:waypoint x="400" y="130" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_Gate1_Manager_di" bpmnElement="Flow_Gate1_Manager">
+        <di:waypoint x="450" y="130" />
+        <di:waypoint x="500" y="130" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="466" y="105" width="18" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_Gate1_Insufficient_di" bpmnElement="Flow_Gate1_Insufficient">
+        <di:waypoint x="425" y="155" />
+        <di:waypoint x="425" y="270" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="433" y="203" width="15" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_Manager_Gate2_di" bpmnElement="Flow_Manager_Gate2">
+        <di:waypoint x="600" y="130" />
+        <di:waypoint x="650" y="130" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_Gate2_Update_di" bpmnElement="Flow_Gate2_Update">
+        <di:waypoint x="700" y="130" />
+        <di:waypoint x="820" y="130" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="724" y="113" width="48" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_Gate2_Reject_di" bpmnElement="Flow_Gate2_Reject">
+        <di:waypoint x="675" y="155" />
+        <di:waypoint x="675" y="270" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="678" y="203" width="44" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_Update_SendApproval_di" bpmnElement="Flow_Update_SendApproval">
+        <di:waypoint x="920" y="130" />
+        <di:waypoint x="1010" y="130" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_SendApproval_End_di" bpmnElement="Flow_SendApproval_End">
+        <di:waypoint x="1110" y="130" />
+        <di:waypoint x="1202" y="130" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_RejectNotify_End_di" bpmnElement="Flow_RejectNotify_End">
+        <di:waypoint x="725" y="310" />
+        <di:waypoint x="775" y="310" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_InsufficientNotify_End_di" bpmnElement="Flow_InsufficientNotify_End">
+        <di:waypoint x="475" y="310" />
+        <di:waypoint x="525" y="310" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>
