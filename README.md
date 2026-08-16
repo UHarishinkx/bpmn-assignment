@@ -24,7 +24,7 @@ There are two decision points (balance check, manager decision), each represente
 ---
 
 ## Scenario 2: Online Purchase Order Processing
-![Scenario 2 - Online Purchase](images/purchase order.png)
+![Scenario 2 - Online Purchase](images/purchase-order.png)
 
 ### Process Description
 A customer places an online order. The system checks stock availability and processes payment before confirming and shipping the order.
